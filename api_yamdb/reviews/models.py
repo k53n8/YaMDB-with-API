@@ -3,6 +3,22 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
 
+
+class Category(models.Model):
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название',
+        help_text='Выберите категорию'
+    )
+    slug = models.SlugField(
+        max_length=50,
+        unique=True,
+        verbose_name='Слаг'
+    )
+
+    def __str__(self):
+        return self.slug
+
 class User(AbstractUser):
     Admin = 'Admin'
     Moderator = 'Moderator'
@@ -28,3 +44,4 @@ class User(AbstractUser):
         default=User,
         verbose_name='Роль'
     )
+
