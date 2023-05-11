@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
 class User(AbstractUser):
@@ -14,21 +15,26 @@ class User(AbstractUser):
     ]
 
     username = models.CharField(
-        max_length=100,
+        max_length=20,
         unique=True,
-        verbose_name='Псевдоним пользователя'
+        verbose_name='Псевдоним пользователя',
+        validators=[UnicodeUsernameValidator]
     )
-    bio = models.TextField(
-        blank=True,
-        verbose_name='Информация о пользователе'
+    email = models.EmailField(
+        unique=True,
+        max_length=75
     )
     role = models.CharField(
         choices=roles,
         default=User,
         verbose_name='Роль'
     )
+    bio = models.TextField(
+        blank=True,
+        verbose_name='Информация о пользователе'
+    )
 
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = ['email']
 
     class Meta:
         ordering = ['id']
