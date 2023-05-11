@@ -18,13 +18,13 @@ class User(AbstractUser):
         max_length=20,
         unique=True,
         verbose_name='Псевдоним пользователя',
-        validators=[UnicodeUsernameValidator]
+        validators=[UnicodeUsernameValidator, ]
     )
     email = models.EmailField(
         unique=True,
         max_length=75
     )
-    role = models.CharField(
+    role = models.SlugField(
         choices=roles,
         default=User,
         verbose_name='Роль'
@@ -33,8 +33,6 @@ class User(AbstractUser):
         blank=True,
         verbose_name='Информация о пользователе'
     )
-
-    USERNAME_FIELD = ['email']
 
     class Meta:
         ordering = ['id']
