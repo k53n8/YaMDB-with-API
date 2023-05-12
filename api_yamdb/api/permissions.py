@@ -3,6 +3,7 @@ from rest_framework import permissions
 
 class AdminOrReadOnly(permissions.BasePermission):
     """Разрешение для админа или любого GET-запроса."""
+
     def has_permission(self, request, view):
         if request.user.is_authenticated:
             return (
@@ -24,6 +25,7 @@ class AdminOrReadOnly(permissions.BasePermission):
 
 class IsAdminModeratorOwnerOrReadOnly(permissions.BasePermission):
     """Разрешение для автора, модератора, админа или суперюзера."""
+
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS

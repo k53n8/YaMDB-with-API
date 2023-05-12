@@ -1,10 +1,11 @@
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title
+from django.db.models import Avg
 
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений."""
+
     class Meta:
         model = Category
         fields = (
@@ -16,6 +17,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров произведений."""
+
     class Meta:
         model = Genre
         fields = (
@@ -26,6 +28,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class ShowTitlesSerializer(serializers.ModelSerializer):
+
     """Сериализатор для запросов к произведениям."""
     rating = serializers.SerializerMethodField()
     genre = GenreSerializer(
@@ -51,6 +54,7 @@ class ShowTitlesSerializer(serializers.ModelSerializer):
 
 class CreateUpdateTitleSerializer(serializers.ModelSerializer):
     """Сериализатор для запросов к произведениям."""
+
     category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all(),

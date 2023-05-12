@@ -6,6 +6,8 @@ from .serializers import (
     ShowTitlesSerializer,
 
 )
+
+
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
