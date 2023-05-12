@@ -1,18 +1,20 @@
-from .mixins import ListCreateDestroyViewSet
+from .permissions import (
+    AdminOrReadOnly,
+)
 from .serializers import (
     CategoriesSerializer,
     CreateUpdateTitleSerializer,
     GenresSerializer,
     ShowTitlesSerializer,
-
 )
+from reviews.models import Categories, Genres, Title
+from .mixins import ListCreateDestroyViewSet
 
 
 class CategoriesViewSet(ListCreateDestroyViewSet):
     """
     Views отвечающий за работу c категориями прoизведений.
     """
-
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
     permission_classes = (AdminOrReadOnly,)
@@ -22,16 +24,15 @@ class GenresViewSet(ListCreateDestroyViewSet):
     """
     Views отвечающий за работу c жанрами произведений.
     """
-
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     permission_classes = (AdminOrReadOnly,)
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     """
     Views отвечающий за определенное произведение к которому пойдут отзывы.
     """
-
     queryset = Title.objects.all()
     serializer_class = CreateUpdateTitleSerializer
     permission_classes = (AdminOrReadOnly,)

@@ -1,7 +1,8 @@
-from rest_framework import serializers
-
 from django.db.models import Avg
 
+from rest_framework import serializers
+
+from reviews.models import Categories,  Genres, Title
 
 class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений."""
