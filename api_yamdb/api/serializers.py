@@ -3,11 +3,11 @@ from rest_framework import serializers
 from django.db.models import Avg
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений."""
 
     class Meta:
-        model = Category
+        model = Categories
         fields = (
             'name',
             'slug',
@@ -15,11 +15,11 @@ class CategorySerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-class GenreSerializer(serializers.ModelSerializer):
+class GenresSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров произведений."""
 
     class Meta:
-        model = Genre
+        model = Genres
         fields = (
             'name',
             'slug',
@@ -28,13 +28,13 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class ShowTitlesSerializer(serializers.ModelSerializer):
-
     """Сериализатор для запросов к произведениям."""
+
     rating = serializers.SerializerMethodField()
-    genre = GenreSerializer(
+    genre = GenresSerializer(
         many=True
     )
-    category = CategorySerializer()
+    category = CategoriesSerializer()
 
     class Meta:
         fields = (
@@ -57,13 +57,13 @@ class CreateUpdateTitleSerializer(serializers.ModelSerializer):
 
     category = serializers.SlugRelatedField(
         slug_field='slug',
-        queryset=Category.objects.all(),
+        queryset=Categories.objects.all(),
         required=True,
     )
 
     genre = serializers.SlugRelatedField(
         slug_field='slug',
-        queryset=Genre.objects.all(),
+        queryset=Genres.objects.all(),
         many=True,
         required=False,
     )
