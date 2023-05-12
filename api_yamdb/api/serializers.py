@@ -28,9 +28,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        ordering = ['id']
-        fields = ('username', 'email', 'role',
-                  'bio', 'first_name', 'last_name')
+        ordering = ['username']
+        fields = ('username', 'email', 'first_name', 'last_name',
+                  'bio', 'role')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,8 +40,8 @@ class UserSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ('username', 'email', 'role',
-                  'bio', 'first_name', 'last_name')
+        fields = ('username', 'email', 'first_name', 'last_name',
+                  'bio', 'role')
         read_only_fields = ('username', 'email', 'role')
 
 
@@ -91,7 +91,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -101,4 +101,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('text', 'author', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date')

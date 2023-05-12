@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
@@ -19,6 +19,8 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     pagination_class = PageNumberPagination
     lookup_field = 'username'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ('username',)
 
     @action(
         detail=False, methods=['get', 'patch'],
@@ -54,7 +56,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewset(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrAuthor]
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminOrAuthor)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs['review_id'])
