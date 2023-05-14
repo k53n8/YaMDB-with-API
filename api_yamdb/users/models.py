@@ -4,14 +4,14 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
 class User(AbstractUser):
-    Admin = 'Admin'
-    Moderator = 'Moderator'
-    User = 'User'
+    ADMIN = 'Admin'
+    MODERATOR = 'Moderator'
+    USER = 'User'
 
     roles = [
-        (Admin, 'Administrator'),
-        (Moderator, 'Moderator'),
-        (User, 'User'),
+        (ADMIN, 'Administrator'),
+        (MODERATOR, 'Moderator'),
+        (USER, 'User'),
     ]
 
     username = models.CharField(
@@ -29,15 +29,28 @@ class User(AbstractUser):
         verbose_name='Имя пользователя',
         blank=True
     )
+    last_name = models.CharField(
+        max_length=150,
+        verbose_name='Фамилия пользователя',
+        blank=True
+    )
     role = models.SlugField(
         choices=roles,
-        default=User,
+        default=USER,
         verbose_name='Роль'
     )
     bio = models.TextField(
         blank=True,
         verbose_name='Информация о пользователе'
     )
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
 
     class Meta:
         ordering = ['id']
