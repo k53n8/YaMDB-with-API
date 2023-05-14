@@ -29,11 +29,6 @@ class User(AbstractUser):
         verbose_name='Имя пользователя',
         blank=True
     )
-    first_name = models.CharField(
-        max_length=150,
-        verbose_name='Фамилия пользователя',
-        blank=True
-    )
     role = models.SlugField(
         choices=roles,
         default=User,
