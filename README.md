@@ -30,6 +30,9 @@
 Выполните миграции:
 `python manage.py migrate`
 
+Заполните БД данными из csv файлов:
+`python manage.py importcsv`
+
 Запустите сервер:
 `python manage.py runserver`
 
