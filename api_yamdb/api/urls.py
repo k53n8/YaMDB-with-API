@@ -20,3 +20,4 @@ urlpatterns = [
     path('v1/auth/signup/', APISignUp.as_view(), name='signup'),
     path('v1/', include(v1_router.urls)),
     path('', include(v1_router.urls)),
+]
