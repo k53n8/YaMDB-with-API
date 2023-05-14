@@ -6,7 +6,13 @@ from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
+from auth.send_code import send_mail_with_code
+from auth.get_token import get_tokens_for_user
+from serializers import (ReviewSerializer, CommentSerializer,
+                         AdminUserSerializer, UserSerializer,
+                         GetTokenSerializer, SignUpSerializer)
+from reviews.models import Title, Genre, Category, Comment, Review
 from .serializers import (
     ReviewSerializer,
     CommentSerializer,
@@ -23,7 +29,8 @@ from users.models import User
 from .permissions import (
     IsAdminModeratorOwnerOrReadOnly,
     AdminOrReadOnly,
-    IsAdmin)
+    IsAdmin
+)
 from .filters import TitlesFilter
 
 
@@ -92,6 +99,35 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Reviews, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
 
+
+class APISignUp(APIView):
+
+    def post(self, request):
+        serializer = SignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            user = User.objects.get_or_create(
+                username=serializer.validated_data['username'],
+                email=serializer.validated_data['email'])
+        except User.DoesNotExist:
+            return Response(
+                {'username': 'Пользователь не найден.'},
+                status=status.HTTP_404_NOT_FOUND)
+        user.confirmation_code = send_mail_with_code(request.data)
+        user.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class APIGetToken(APIView):
+
+    def post(self, request):
+        serializer = GetTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = User.objects.get(
+            username=serializer.validated_data['username'])
+        token = get_tokens_for_user(user)
+        return Response({'token': token},
+                        status=status.HTTP_201_CREATED)
 
 class CategoriesViewSet(ListCreateDestroyViewSet):
     """

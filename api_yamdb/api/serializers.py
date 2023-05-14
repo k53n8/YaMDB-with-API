@@ -45,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'bio', 'role')
         read_only_fields = ('username', 'email', 'role')
 
-
+        
 class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений."""
 
@@ -161,3 +161,22 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comments
         fields = ('id', 'text', 'author', 'pub_date')
+
+
+class GetTokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'confirmation_code'
+        )
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'username')
