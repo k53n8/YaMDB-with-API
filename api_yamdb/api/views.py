@@ -7,16 +7,16 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from auth.send_code import send_mail_with_code
-from auth.get_token import get_tokens_for_user
+from authentication.get_token import get_user_token
+from authentication.send_confirmation import send_mail_with_code
 
-from serializers import (ReviewSerializer, CommentSerializer,
-                         AdminUserSerializer, UserSerializer,
-                         GetTokenSerializer, SignUpSerializer)
+from .serializers import (ReviewSerializer, CommentSerializer,
+                          AdminUserSerializer, UserSerializer,
+                          GetTokenSerializer, SignUpSerializer)
 
-from reviews.models import Title, Genre, Category, Comment, Review
+from reviews.models import Title, Review
 from users.models import User
-from permissions import IsAdmin, IsAdminOrAuthor
+from .permissions import IsAdmin, IsAdminOrAuthor
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -100,6 +100,6 @@ class APIGetToken(APIView):
         serializer.is_valid(raise_exception=True)
         user = User.objects.get(
             username=serializer.validated_data['username'])
-        token = get_tokens_for_user(user)
+        token = get_user_token(user)
         return Response({'token': token},
                         status=status.HTTP_201_CREATED)
