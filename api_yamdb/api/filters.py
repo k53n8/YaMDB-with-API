@@ -1,4 +1,4 @@
-from rest_framework import filters
+from django_filters import rest_framework as filters
 
 from reviews.models import Titles
 
