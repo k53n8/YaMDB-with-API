@@ -5,7 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from users.models import User
 
 
-class Category(models.Model):
+class Categories(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name='Название',
@@ -23,17 +23,17 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name[:settings.SYMBOL_LIMIT]
+        return self.name
 
 
-class Genre(models.Model):
+class Genres(models.Model):
     name = models.CharField(
-        max_length=100,
+        max_length=256,
         verbose_name='Название',
         help_text='Выберите жанр'
     )
     slug = models.SlugField(
-        max_length=20,
+        max_length=50,
         unique=True,
         verbose_name='Слаг'
     )
@@ -44,12 +44,12 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name[:settings.SYMBOL_LIMIT]
+        return self.name
 
 
-class Title(models.Model):
+class Titles(models.Model):
     name = models.CharField(
-        max_length=100,
+        max_length=256,
         verbose_name='Название',
         help_text='Выберите название произведения'
     )
@@ -59,7 +59,7 @@ class Title(models.Model):
         blank=True
     )
     category = models.ForeignKey(
-        Category,
+        Categories,
         verbose_name='Категория',
         on_delete=models.SET_NULL,
         null=True,
@@ -67,7 +67,7 @@ class Title(models.Model):
         related_name='titles'
     )
     genre = models.ManyToManyField(
-        Genre,
+        Genres,
         blank=True,
         verbose_name='Жанр',
         related_name='titles'
@@ -83,12 +83,12 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name[:settings.SYMBOL_LIMIT]
+        return self.name
 
 
-class Review(models.Model):
+class Reviews(models.Model):
     title = models.ForeignKey(
-        Title,
+        Titles,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведение'
@@ -127,12 +127,12 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.title[:settings.SYMBOL_LIMIT]
+        return self.title
 
 
-class Comment(models.Model):
+class Comments(models.Model):
     review = models.ForeignKey(
-        Review,
+        Reviews,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Отзыв'
