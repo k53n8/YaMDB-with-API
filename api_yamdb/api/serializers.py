@@ -3,10 +3,11 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from users.models import User
-from reviews.models import Titles, Genres, Categories, Comments, Reviews
-from .validators import UsernameMinSymbolLimit
+from reviews.models import Title, Genre, Category, Comment, Review
+from .validators import usernamevalidator
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
@@ -17,7 +18,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         validators=[
             UniqueValidator(queryset=User.objects.all()),
-            UsernameMinSymbolLimit
+            usernamevalidator
         ],
         required=True,
     )
@@ -50,7 +51,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений."""
 
     class Meta:
-        model = Categories
+        model = Category
         fields = (
             'name',
             'slug',
@@ -62,7 +63,7 @@ class GenresSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров произведений."""
 
     class Meta:
-        model = Genres
+        model = Genre
         fields = (
             'name',
             'slug',
@@ -84,7 +85,7 @@ class ShowTitlesSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'rating',
             'description', 'genre', 'category'
         )
-        model = Titles
+        model = Title
 
     def get_rating(self, obj):
         rating = obj.reviews.aggregate(Avg('score'))['score__avg']
@@ -100,19 +101,19 @@ class CreateUpdateTitleSerializer(serializers.ModelSerializer):
 
     category = serializers.SlugRelatedField(
         slug_field='slug',
-        queryset=Categories.objects.all(),
+        queryset=Category.objects.all(),
         required=True,
     )
 
     genre = serializers.SlugRelatedField(
         slug_field='slug',
-        queryset=Genres.objects.all(),
+        queryset=Genre.objects.all(),
         many=True,
         required=False,
     )
 
     class Meta:
-        model = Titles
+        model = Title
         fields = (
             'id',
             'name',
@@ -137,9 +138,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     def validate(self, data):
         request = self.context['request']
         title_id = request.parser_context['kwargs'].get('title_id')
-        title = get_object_or_404(Titles, pk=title_id)
+        title = get_object_or_404(Title, pk=title_id)
         if request.method == 'POST':
-            if Reviews.objects.filter(
+            if Review.objects.filter(
                 title=title, author=request.user
             ).exists():
                 raise ValidationError(
@@ -148,8 +149,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         return data
 
     class Meta:
-        model = Reviews
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        model = Review
+        fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -159,13 +160,16 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Comments
+        model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
 
 
 class GetTokenSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    confirmation_code = serializers.CharField(required=True)
+    username = serializers.CharField(
+        max_length=150,
+        validators=(UnicodeUsernameValidator,)
+    )
+    confirmation_code = serializers.CharField()
 
     class Meta:
         model = User
@@ -176,7 +180,14 @@ class GetTokenSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+    username = serializers.SlugField(max_length=150)
+    email = serializers.EmailField(max_length=254)
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError("Invalid username")
+        return value
 
     class Meta:
         model = User
-        fields = ('email', 'username')
+        fields = ('username', 'email')

@@ -5,7 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from users.models import User
 
 
-class Categories(models.Model):
+class Category(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name='Название',
@@ -26,7 +26,7 @@ class Categories(models.Model):
         return self.name
 
 
-class Genres(models.Model):
+class Genre(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name='Название',
@@ -47,7 +47,7 @@ class Genres(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name='Название',
@@ -59,7 +59,7 @@ class Titles(models.Model):
         blank=True
     )
     category = models.ForeignKey(
-        Categories,
+        Category,
         verbose_name='Категория',
         on_delete=models.SET_NULL,
         null=True,
@@ -67,7 +67,7 @@ class Titles(models.Model):
         related_name='titles'
     )
     genre = models.ManyToManyField(
-        Genres,
+        Genre,
         blank=True,
         verbose_name='Жанр',
         related_name='titles'
@@ -86,9 +86,9 @@ class Titles(models.Model):
         return self.name
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     title = models.ForeignKey(
-        Titles,
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведение'
@@ -121,7 +121,7 @@ class Reviews(models.Model):
 
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'author'],
+                fields=('title', 'author'),
                 name='unique_review'
             ),
         ]
@@ -130,9 +130,9 @@ class Reviews(models.Model):
         return self.title
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     review = models.ForeignKey(
-        Reviews,
+        Review,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Отзыв'
