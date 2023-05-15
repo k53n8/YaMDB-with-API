@@ -44,7 +44,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name', 'last_name',
                   'bio', 'role')
-        read_only_fields = ('username', 'email', 'role')
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
