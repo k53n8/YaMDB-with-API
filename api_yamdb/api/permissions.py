@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
-    '''Прверка смертных'''
+    '''Автор или метод GET'''
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS

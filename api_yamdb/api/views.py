@@ -18,6 +18,29 @@ from .serializers import (ReviewSerializer, CommentSerializer,
 from reviews.models import Title, Review
 from users.models import User
 from permissions import IsAdmin, IsAdminOrAuthor
+=======
+from auth.send_code import send_mail_with_code
+from auth.get_token import get_tokens_for_user
+from .serializers import (ReviewSerializer, CommentSerializer,
+                          AdminUserSerializer, UserSerializer,
+                          GetTokenSerializer, SignUpSerializer)
+from reviews.models import Titles, Genres, Categories, Reviews
+from .serializers import (
+    ReviewSerializer,
+    CommentSerializer,
+    AdminUserSerializer,
+    UserSerializer,
+    CategoriesSerializer,
+    CreateUpdateTitleSerializer,
+    GenresSerializer,
+    ShowTitlesSerializer,
+)
+from reviews.models import Titles, Genres, Categories, Reviews
+from .mixins import ListCreateDestroyViewSet
+from users.models import User
+from .permissions import (IsAuthorOrReadOnly, IsAdmin, IsModer)
+from .filters import TitlesFilter
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -55,7 +78,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, IsModer, IsAdmin)
 
     def get_queryset(self):
         title = get_object_or_404(Titles, pk=self.kwargs['title_id'])
@@ -73,7 +96,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticatedOrReadOnly,
-                          IsAdminModeratorOwnerOrReadOnly,)
+                          IsAdmin, IsModer, IsAuthorOrReadOnly)
 
     def get_queryset(self):
         review = get_object_or_404(Reviews, pk=self.kwargs['review_id'])
@@ -115,13 +138,14 @@ class APIGetToken(APIView):
         return Response({'token': token},
                         status=status.HTTP_201_CREATED)
 
+
 class CategoriesViewSet(ListCreateDestroyViewSet):
     """
     Views отвечающий за работу c категориями прoизведений.
     """
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, IsAdmin)
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ('name',)
@@ -133,7 +157,7 @@ class GenresViewSet(ListCreateDestroyViewSet):
     """
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, IsAdmin)
     lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ('name',)
@@ -145,7 +169,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     """
     queryset = Titles.objects.all()
     serializer_class = CreateUpdateTitleSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, IsAdmin)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitlesFilter
 
