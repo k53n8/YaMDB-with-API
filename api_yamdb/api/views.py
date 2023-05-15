@@ -10,37 +10,16 @@ from rest_framework.views import APIView
 
 from authentication.get_token import get_user_token
 from authentication.send_confirmation import send_mail_with_code
-
-from .serializers import (ReviewSerializer, CommentSerializer,
-                          AdminUserSerializer, UserSerializer,
-                          GetTokenSerializer, SignUpSerializer)
-
-from reviews.models import Title, Review
+from reviews.models import Titles, Genres, Categories, Reviews
 from users.models import User
-from permissions import IsAdmin, IsAdminOrAuthor
-=======
-from auth.send_code import send_mail_with_code
-from auth.get_token import get_tokens_for_user
 from .serializers import (ReviewSerializer, CommentSerializer,
                           AdminUserSerializer, UserSerializer,
-                          GetTokenSerializer, SignUpSerializer)
-from reviews.models import Titles, Genres, Categories, Reviews
-from .serializers import (
-    ReviewSerializer,
-    CommentSerializer,
-    AdminUserSerializer,
-    UserSerializer,
-    CategoriesSerializer,
-    CreateUpdateTitleSerializer,
-    GenresSerializer,
-    ShowTitlesSerializer,
-)
-from reviews.models import Titles, Genres, Categories, Reviews
+                          GetTokenSerializer, SignUpSerializer,
+                          CategoriesSerializer, CreateUpdateTitleSerializer,
+                          GenresSerializer, ShowTitlesSerializer)
 from .mixins import ListCreateDestroyViewSet
-from users.models import User
 from .permissions import (IsAuthorOrReadOnly, IsAdmin, IsModer)
 from .filters import TitlesFilter
-
 
 
 class UserViewSet(viewsets.ModelViewSet):

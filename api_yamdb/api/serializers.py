@@ -45,7 +45,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'bio', 'role')
         read_only_fields = ('username', 'email', 'role')
 
-        
+
 class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений."""
 
