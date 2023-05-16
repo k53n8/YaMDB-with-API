@@ -3,47 +3,50 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import RegexValidator
 
 from users.models import User
 from reviews.models import Title, Genre, Category, Comment, Review
 from .validators import usernamevalidator
 
 
-class AdminUserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для эндпойнта /users/,
-    используется админом
+    Сериализатор для работы с пользователями.
     """
     username = serializers.CharField(
+        max_length=150,
         validators=[
-            UniqueValidator(queryset=User.objects.all()),
-            usernamevalidator
+            RegexValidator(regex=r'^[\w@.+-_]+$'),
+            UniqueValidator(queryset=User.objects.all())
         ],
         required=True,
     )
-    email = serializers.EmailField(
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name',
+                  'bio', 'role')
+
+
+class UserPatchSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для редактирования профиля.
+    """
+    username = serializers.CharField(
+        max_length=150,
         validators=[
+            RegexValidator(regex=r'^[\w@.+-_]+$'),
             UniqueValidator(queryset=User.objects.all())
-        ]
+        ],
+        required=True,
     )
 
     class Meta:
         model = User
-        ordering = ['username']
         fields = ('username', 'email', 'first_name', 'last_name',
                   'bio', 'role')
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для эндпойнта /users/me,
-    используется пользователем
-    """
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'first_name', 'last_name',
-                  'bio', 'role')
+        read_only_fields = ('role',)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -163,19 +166,15 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'pub_date')
 
 
-class GetTokenSerializer(serializers.ModelSerializer):
+class GetTokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=150,
-        validators=(UnicodeUsernameValidator,)
+        validators=[
+            UniqueValidator(queryset=User.objects.all()),
+            usernamevalidator
+        ]
     )
     confirmation_code = serializers.CharField()
-
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'confirmation_code'
-        )
 
 
 class SignUpSerializer(serializers.ModelSerializer):

@@ -1,24 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import RegexValidator
 
 
 class User(AbstractUser):
-    ADMIN = 'Admin'
-    MODERATOR = 'Moderator'
-    USER = 'User'
+    ADMIN = 'admin'
+    MODERATOR = 'moderator'
+    USER = 'user'
 
-    roles = [
-        (ADMIN, 'Administrator'),
-        (MODERATOR, 'Moderator'),
-        (USER, 'User'),
+    ROLES = [
+        (ADMIN, 'administrator'),
+        (MODERATOR, 'moderator'),
+        (USER, 'user'),
     ]
 
     username = models.CharField(
         max_length=150,
         unique=True,
         verbose_name='Псевдоним пользователя',
-        validators=[UnicodeUsernameValidator, ]
+        validators=[
+            RegexValidator(regex=r'^[\w@.+-_]+$')
+        ]
     )
     email = models.EmailField(
         unique=True,
@@ -35,7 +37,7 @@ class User(AbstractUser):
         blank=True
     )
     role = models.SlugField(
-        choices=roles,
+        choices=ROLES,
         default=USER,
         verbose_name='Роль'
     )
@@ -45,12 +47,16 @@ class User(AbstractUser):
     )
 
     @property
+    def is_user(self):
+        return self.role == self.USER
+
+    @property
     def is_moderator(self):
         return self.role == self.MODERATOR
 
     @property
     def is_admin(self):
-        return self.role == self.ADMIN
+        return self.role == self.ADMIN or self.is_superuser
 
     class Meta:
         ordering = ['id']

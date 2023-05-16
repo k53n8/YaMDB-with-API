@@ -16,31 +16,33 @@ from authentication.send_confirmation import send_mail_with_code
 from reviews.models import Title, Genre, Category, Review
 from users.models import User
 from .serializers import (ReviewSerializer, CommentSerializer,
-                          AdminUserSerializer, UserSerializer,
+                          UserSerializer, ShowTitlesSerializer,
                           GetTokenSerializer, SignUpSerializer,
                           CategoriesSerializer, CreateUpdateTitleSerializer,
-                          GenresSerializer, ShowTitlesSerializer)
+                          GenresSerializer, UserPatchSerializer)
 from .mixins import ListCreateDestroyViewSet
-from .permissions import (IsAuthorOrReadOnly, IsAdmin, IsModer,
-                          IsAdminModeratorOwnerOrReadOnly, AdminOrReadOnly)
+from .permissions import (IsAdmin,
+                          IsAdminModeratorOwnerOrReadOnly,
+                          AdminOrReadOnly)
 from .filters import TitlesFilter
 
 
 class UserViewSet(viewsets.ModelViewSet):
     """
-    Views отвечающий за работу c пользователями и настройку профиля.
+    View отвечающий за работу c пользователями и настройку профиля.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdmin, IsAuthenticatedOrReadOnly)
     pagination_class = PageNumberPagination
     filter_backends = [SearchFilter]
     search_fields = ('username',)
     lookup_field = 'username'
 
     @action(
-        detail=False, methods=['get', 'patch'],
+        detail=False,
+        methods=['get', 'patch'],
         permission_classes=(IsAuthenticated,),
     )
     def me(self, request):
@@ -49,16 +51,21 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = UserSerializer(
-            user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'PATCH':
+            serializer = UserPatchSerializer(
+                user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """
-    Views отвечающий за работу c отзывами к произведениям.
+    View отвечающий за работу c отзывами к произведениям.
     """
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
@@ -75,7 +82,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
-    Views отвечающий за работу c комментариями к отзывам.
+    View отвечающий за работу c комментариями к отзывам.
     """
     serializer_class = CommentSerializer
     pagination_class = PageNumberPagination
@@ -131,7 +138,7 @@ class APIGetToken(APIView):
 
 class CategoriesViewSet(ListCreateDestroyViewSet):
     """
-    Views отвечающий за работу c категориями прoизведений.
+    View отвечающий за работу c категориями прoизведений.
     """
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
@@ -143,7 +150,7 @@ class CategoriesViewSet(ListCreateDestroyViewSet):
 
 class GenresViewSet(ListCreateDestroyViewSet):
     """
-    Views отвечающий за работу c жанрами произведений.
+    View отвечающий за работу c жанрами произведений.
     """
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
@@ -155,7 +162,7 @@ class GenresViewSet(ListCreateDestroyViewSet):
 
 class TitlesViewSet(viewsets.ModelViewSet):
     """
-    Views отвечающий за определенное произведение к которому пойдут отзывы.
+    View отвечающий за определенное произведение к которому пойдут отзывы.
     """
     queryset = Title.objects.all()
     serializer_class = CreateUpdateTitleSerializer

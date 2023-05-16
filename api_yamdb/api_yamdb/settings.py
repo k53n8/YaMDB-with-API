@@ -22,13 +22,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'api.apps.ApiConfig',
     'reviews.apps.ReviewsConfig',
     'users.apps.UsersConfig',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt',
-    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -116,7 +116,11 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 # Consts
 
 SYMBOL_LIMIT = 15
+MIN_CONFIRMATION_VALUE = 100000
+MAX_CONFIRMATION_VALUE = 999999
 
+
+# REST
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -162,7 +166,4 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-
 DEFAULT_FROM_EMAIL = 'temporary@yamdb.ru'
-MIN_CONFIRMATION_VALUE = 100000
-MAX_CONFIRMATION_VALUE = 999999
