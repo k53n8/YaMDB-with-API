@@ -135,7 +135,7 @@ class APIGetToken(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         token = AccessToken.for_user(user)
         return Response({'token': token},
-                        status=status.HTTP_201_CREATED)
+                        status=status.HTTP_200_OK)
 
 
 class CategoriesViewSet(ListCreateDestroyViewSet):
