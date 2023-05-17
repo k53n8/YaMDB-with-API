@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
+import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -95,7 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -116,8 +117,14 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 # Consts
 
 SYMBOL_LIMIT = 15
-MIN_CONFIRMATION_VALUE = 100000
-MAX_CONFIRMATION_VALUE = 999999
+
+USERNAME_SYM_LIMIT = 150
+
+SLUG_SYM_LIMIT = 50
+
+NAME_SYM_LIMIT = 254
+
+EMAIL_SYM_LIMIT = 254
 
 
 # REST
@@ -166,4 +173,11 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+
+# EMAIL
+
 DEFAULT_FROM_EMAIL = 'temporary@yamdb.ru'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'mock_email')

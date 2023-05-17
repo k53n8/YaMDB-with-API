@@ -13,7 +13,7 @@
 
 # Установка проекта: 
 Клонируйте этот репозиторий с GitHub:
-`https://github.com/k53n8/api_yamdb`
+`git clone git@github.com:k53n8/api_yamdb.git`
 
 Создайте виртуальное окружение:
 `python -m venv venv`
@@ -35,6 +35,9 @@
 
 Запустите сервер:
 `python manage.py runserver`
+
+Для доступа к документации (ReDoc) в бразуере перейдите по ссылке:
+`http://127.0.0.1:8000/redoc/`
 
 # Над проектом работали:
 - https://github.com/brozzelerro

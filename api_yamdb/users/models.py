@@ -1,6 +1,8 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
+
+from api.validators import me_forbidden, username_symbols
 
 
 class User(AbstractUser):
@@ -15,26 +17,16 @@ class User(AbstractUser):
     ]
 
     username = models.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_SYM_LIMIT,
         unique=True,
         verbose_name='Псевдоним пользователя',
         validators=[
-            RegexValidator(regex=r'^[\w@.+-_]+$')
+            me_forbidden,
+            username_symbols
         ]
     )
     email = models.EmailField(
         unique=True,
-        max_length=254,
-    )
-    first_name = models.CharField(
-        max_length=150,
-        verbose_name='Имя пользователя',
-        blank=True
-    )
-    last_name = models.CharField(
-        max_length=150,
-        verbose_name='Фамилия пользователя',
-        blank=True
     )
     role = models.SlugField(
         choices=ROLES,
@@ -47,10 +39,6 @@ class User(AbstractUser):
     )
 
     @property
-    def is_user(self):
-        return self.role == self.USER
-
-    @property
     def is_moderator(self):
         return self.role == self.MODERATOR
 
@@ -59,6 +47,6 @@ class User(AbstractUser):
         return self.role == self.ADMIN or self.is_superuser
 
     class Meta:
-        ordering = ['id']
+        ordering = ['username']
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'

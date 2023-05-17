@@ -2,7 +2,7 @@ import csv
 
 from django.core.management import BaseCommand
 
-from reviews.models import User, Categories, Genres, Titles, Reviews, Comments
+from reviews.models import User, Category, Genre, Title, Review, Comment
 
 CSV_PATH = 'static/data/'
 
@@ -28,21 +28,21 @@ class Command(BaseCommand):
                   encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
-                Categories.objects.get_or_create(
+                Category.objects.get_or_create(
                     name=row['name'],
                     slug=row['slug'])
 
         with open('static/data/genre.csv', 'r', encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
-                Genres.objects.get_or_create(
+                Genre.objects.get_or_create(
                     name=row['name'],
                     slug=row['slug'])
 
         with open('static/data/titles.csv', 'r', encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
-                Titles.objects.get_or_create(
+                Title.objects.get_or_create(
                     name=row['name'],
                     year=row['year'],
                     category_id=row['category'])
@@ -50,13 +50,13 @@ class Command(BaseCommand):
         with open('static/data/genre_title.csv') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
-                title = Titles.objects.get(id=row['title_id'])
+                title = Title.objects.get(id=row['title_id'])
                 title.genre.add(row['genre_id'])
 
         with open('static/data/review.csv', 'r', encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
-                Reviews.objects.get_or_create(
+                Review.objects.get_or_create(
                     title_id=row['title_id'],
                     text=row['text'],
                     author_id=row['author'],
@@ -67,10 +67,12 @@ class Command(BaseCommand):
                   encoding='utf-8') as csvfile:
             dict_reader = csv.DictReader(csvfile)
             for row in dict_reader:
-                Comments.objects.get_or_create(
+                Comment.objects.get_or_create(
                     review_id=row['review_id'],
                     text=row['text'],
                     author_id=row['author'],
                     pub_date=row['pub_date'])
 
-        self.stdout.write(self.style.SUCCESS('Success !'))
+        self.stdout.write(self.style.SUCCESS(
+            'Данные из CSV успешно импортированы!'
+        ))

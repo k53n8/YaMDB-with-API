@@ -1,20 +1,27 @@
 from django.db import models
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    RegexValidator
+)
 
 from users.models import User
+from api.validators import year_validation
 
 
 class Category(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=settings.NAME_SYM_LIMIT,
         verbose_name='Название',
         help_text='Выберите категорию'
     )
     slug = models.SlugField(
-        max_length=50,
+        max_length=settings.SLUG_SYM_LIMIT,
         unique=True,
         verbose_name='Слаг',
+        validators=[
+            RegexValidator(regex=r'^[-a-zA-Z0-9_]+$')]
     )
 
     class Meta:
@@ -28,14 +35,16 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=settings.NAME_SYM_LIMIT,
         verbose_name='Название',
         help_text='Выберите жанр'
     )
     slug = models.SlugField(
-        max_length=50,
+        max_length=settings.SLUG_SYM_LIMIT,
         unique=True,
-        verbose_name='Слаг'
+        verbose_name='Слаг',
+        validators=[
+            RegexValidator(regex=r'^[-a-zA-Z0-9_]+$')]
     )
 
     class Meta:
@@ -49,21 +58,18 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=settings.NAME_SYM_LIMIT,
         verbose_name='Название',
         help_text='Выберите название произведения'
     )
     year = models.IntegerField(
         verbose_name='Год',
-        null=True,
-        blank=True
+        validators=[year_validation]
     )
     category = models.ForeignKey(
         Category,
         verbose_name='Категория',
         on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
         related_name='titles'
     )
     genre = models.ManyToManyField(
