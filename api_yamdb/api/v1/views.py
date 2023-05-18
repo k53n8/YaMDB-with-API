@@ -105,9 +105,17 @@ class APISignUp(APIView):
     def post(self, request):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        username = serializer.data['username']
+        email = serializer.data['email']
+        if not User.objects.filter(
+            username=username
+        ).first() == User.objects.filter(email=email).first():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         user, _ = User.objects.get_or_create(
-            username=serializer.data['username'],
-            email=serializer.data['email']
+            username=username,
+            email=email
         )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
@@ -134,7 +142,7 @@ class APIGetToken(APIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         token = AccessToken.for_user(user)
-        return Response({'token': token},
+        return Response({'token': str(token)},
                         status=status.HTTP_200_OK)
 
 
@@ -160,7 +168,6 @@ class TitlesViewSet(viewsets.ModelViewSet):
     """
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')).all().order_by('name')
-    serializer_class = CreateUpdateTitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitlesFilter

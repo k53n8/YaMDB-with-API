@@ -11,7 +11,7 @@ def me_forbidden(value):
 
 
 def year_validation(value):
-    if value > datetime.datetime.now().year or value <= 0:
+    if value > datetime.datetime.now().year:
         raise ValidationError(
             (f'Ошибка! Значение года не может быть равно {value}!')
         )

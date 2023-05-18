@@ -7,14 +7,14 @@ from django.core.validators import (
 )
 
 from users.models import User
-from api.validators import year_validation
+from api.v1.validators import year_validation
 
 
 class Category(models.Model):
     name = models.CharField(
         max_length=settings.NAME_SYM_LIMIT,
-        verbose_name='Название',
-        help_text='Выберите категорию'
+        verbose_name='Название категории',
+        db_index=True
     )
     slug = models.SlugField(
         max_length=settings.SLUG_SYM_LIMIT,
@@ -25,7 +25,7 @@ class Category(models.Model):
     )
 
     class Meta:
-        ordering = ['name']
+        ordering = ('name', 'slug')
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -36,8 +36,8 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(
         max_length=settings.NAME_SYM_LIMIT,
-        verbose_name='Название',
-        help_text='Выберите жанр'
+        verbose_name='Название жанра',
+        db_index=True
     )
     slug = models.SlugField(
         max_length=settings.SLUG_SYM_LIMIT,
@@ -48,7 +48,7 @@ class Genre(models.Model):
     )
 
     class Meta:
-        ordering = ['name']
+        ordering = ('name', 'slug')
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
@@ -59,8 +59,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         max_length=settings.NAME_SYM_LIMIT,
-        verbose_name='Название',
-        help_text='Выберите название произведения'
+        verbose_name='Наименование произведения'
     )
     year = models.IntegerField(
         verbose_name='Год',
@@ -70,11 +69,11 @@ class Title(models.Model):
         Category,
         verbose_name='Категория',
         on_delete=models.SET_NULL,
-        related_name='titles'
+        related_name='titles',
+        null=True,
     )
     genre = models.ManyToManyField(
         Genre,
-        blank=True,
         verbose_name='Жанр',
         related_name='titles'
     )

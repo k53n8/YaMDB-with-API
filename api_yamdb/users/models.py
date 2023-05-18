@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
-from api.validators import me_forbidden, username_symbols
+from api.v1.validators import me_forbidden, username_symbols
 
 
 class User(AbstractUser):

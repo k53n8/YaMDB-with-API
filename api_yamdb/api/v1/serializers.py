@@ -36,21 +36,18 @@ class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий произведений."""
     class Meta:
         model = Category
-        fields = ('name', 'slug',)
-        lookup_field = 'slug'
+        exclude = ('id',)
 
 
 class GenresSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров произведений."""
-
     class Meta:
         model = Genre
-        fields = ('name', 'slug',)
-        lookup_field = 'slug'
+        exclude = ('id',)
 
 
 class ShowTitlesSerializer(serializers.ModelSerializer):
-    """Сериализатор для запросов к произведениям."""
+    """Сериализатор для GET запросов к произведениям."""
 
     rating = serializers.IntegerField(read_only=True)
     genre = GenresSerializer(many=True)
@@ -70,8 +67,7 @@ class ShowTitlesSerializer(serializers.ModelSerializer):
 
 
 class CreateUpdateTitleSerializer(serializers.ModelSerializer):
-    """Сериализатор для запросов к произведениям."""
-
+    """Сериализатор для небезопасных запросов к произведениям."""
     category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all(),
@@ -82,6 +78,11 @@ class CreateUpdateTitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
     )
+    rating = serializers.IntegerField(read_only=True)
+
+    def to_representation(self, instance):
+        serializer = ShowTitlesSerializer(instance)
+        return serializer.data
 
     class Meta:
         model = Title
@@ -89,6 +90,7 @@ class CreateUpdateTitleSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'year',
+            'rating',
             'description',
             'genre',
             'category',
@@ -159,18 +161,3 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email')
-
-    def validate(self, validated_data):
-        username = validated_data['username']
-        email = validated_data['email']
-        if User.objects.filter(email=email, username=username).exists():
-            return validated_data
-        if User.objects.filter(username=username).exclude(
-            email=email
-        ).exists():
-            raise serializers.ValidationError('Этот никнейм уже занят.')
-        if User.objects.filter(email=email).exclude(
-            username=username
-        ).exists():
-            raise serializers.ValidationError('Этот почтовый адрес уже занят.')
-        return validated_data
